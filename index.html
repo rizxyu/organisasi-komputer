@@ -124,9 +124,11 @@
         .sidebar-drawer {
             position: fixed;
             top: 0;
-            right: -360px;
-            /* Hidden initially */
+            right: 0;
+            transform: translateX(100%);
+            /* Hidden initially offscreen right */
             width: 360px;
+            max-width: 100%;
             height: 100vh;
             background-color: #1a1a1a;
             border-left: 1px solid rgba(255, 255, 255, 0.08);
@@ -140,7 +142,7 @@
         }
 
         .sidebar-drawer.active {
-            transform: translateX(-360px);
+            transform: translateX(0);
         }
 
         /* Drag Handle on the left side of sidebar to pull it close */
@@ -527,18 +529,38 @@
         }
 
         .diagram-ascii {
-            font-family: monospace;
-            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre;
+            /* Keep lines unbroken to preserve diagram structure */
             background-color: #121212;
             padding: 15px;
             border-radius: 8px;
             color: var(--primary);
             text-align: left;
-            display: inline-block;
+            display: block;
+            /* block to allow horizontal scroll when needed */
             margin-top: 15px;
             max-width: 100%;
             overflow-x: auto;
+            /* Enable scroll on overflow for mobile */
             font-size: 0.85rem;
+            line-height: 1.25;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive table {
+            margin: 0;
+            min-width: 500px;
+            /* Force scroll on small screens for table contents */
         }
 
         /* Table Styling */
@@ -598,6 +620,18 @@
         }
 
         @media (max-width: 768px) {
+            nav {
+                padding: 15px 5%;
+            }
+
+            .materi-container {
+                padding: 50px 5% 80px 5%;
+            }
+
+            .intro-section {
+                padding: 60px 5%;
+            }
+
             .answer-box {
                 padding-left: 0;
                 margin-top: 15px;
@@ -607,6 +641,71 @@
             td {
                 padding: 8px;
                 font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .btn-materi {
+                padding: 6px 16px;
+                font-size: 0.8rem;
+            }
+
+            .hero {
+                padding: 110px 5% 40px 5%;
+                min-height: auto;
+                gap: 20px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-content p {
+                font-size: 0.95rem;
+            }
+
+            .intro-circle-img {
+                width: 220px;
+                height: 220px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+                padding-left: 15px;
+            }
+
+            .qa-card {
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 12px;
+            }
+
+            .question-box {
+                gap: 10px;
+            }
+
+            .question-box h2 {
+                font-size: 1.15rem;
+            }
+
+            .q-number {
+                font-size: 0.8rem;
+                padding: 2px 8px;
+            }
+
+            .diagram-placeholder {
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .diagram-ascii {
+                font-size: 0.7rem;
+                padding: 10px;
             }
         }
     </style>
@@ -737,121 +836,129 @@
                 </p>
                 <div class="diagram-placeholder">
                     <strong>Blok Diagram Sistem Komputer (Model Von Neumann)</strong>
-                    <div class="diagram-ascii">
-                        +------------------+ Sinyal Kendali +--------------------+
-                        | UNIT MASUKAN | ---------------------> | CENTRAL |
-                        | (Keyboard/Mouse) | <--------------------- | PROCESSING UNIT | +------------------+ | (CPU) | |
-                            +--------------------+ | Transfer Data | v | Transfer Hasil +------------------+ v | MEMORI
-                            UTAMA | +--------------------+ | (RAM) | | UNIT KELUARAN | +------------------+ |
-                            (Monitor/Printer) | +--------------------+ </div>
-                    </div>
-                    <ul>
-                        <li><strong>Unit Masukan:</strong> Menerima data mentah dari luar dan mengonversinya ke sinyal
-                            digital.</li>
-                        <li><strong>CPU:</strong> Otak pemroses utama yang mengeksekusi perintah dan mengendalikan semua
-                            unit.</li>
-                        <li><strong>Memori Utama:</strong> Penyimpanan volatile untuk menyimpan program dan data aktif
-                            sementara.</li>
-                        <li><strong>Unit Keluaran:</strong> Menyajikan informasi hasil pemrosesan ke format yang
-                            dimengerti pengguna.</li>
-                    </ul>
+<div class="diagram-ascii">  +------------------+     Sinyal Kendali     +--------------------+
+  |   UNIT MASUKAN   | ---------------------> |      CENTRAL       |
+  | (Keyboard/Mouse) | <--------------------- |  PROCESSING UNIT   |
+  +------------------+                        |       (CPU)        |
+           |                                  +--------------------+
+           | Transfer Data                              |
+           v                                            | Transfer Hasil
+  +------------------+                                  v
+  |   MEMORI UTAMA   | <===============================>+
+  |      (RAM)       |
+  +------------------+
+           |
+           v
+  +------------------+
+  |  UNIT KELUARAN   |
+  | (Monitor/Printer)|
+  +------------------+</div>
                 </div>
+                <ul>
+                    <li><strong>Unit Masukan:</strong> Menerima data mentah dari luar dan mengonversinya ke sinyal
+                        digital.</li>
+                    <li><strong>CPU:</strong> Otak pemroses utama yang mengeksekusi perintah dan mengendalikan semua
+                        unit.</li>
+                    <li><strong>Memori Utama:</strong> Penyimpanan volatile untuk menyimpan program dan data aktif
+                        sementara.</li>
+                    <li><strong>Unit Keluaran:</strong> Menyajikan informasi hasil pemrosesan ke format yang
+                        dimengerti pengguna.</li>
+                </ul>
             </div>
+        </div>
 
-            <!-- Soal 2 -->
-            <div class="qa-card" id="soal-2">
-                <div class="question-box">
-                    <span class="q-number">02</span>
-                    <h2>Jelaskan cara kerja CPU dalam memproses instruksi.</h2>
-                </div>
-                <div class="answer-box">
-                    <p>CPU bekerja menggunakan siklus berulang yang dinamakan <strong>Siklus Instruksi (Instruction
-                            Cycle)</strong>:</p>
-                    <ul>
-                        <li><strong>1. Fetch (Mengambil):</strong> Control Unit mengambil kode instruksi biner dari RAM
-                            berdasarkan alamat memori yang dipegang oleh Program Counter (PC).</li>
-                        <li><strong>2. Decode (Menerjemahkan):</strong> Control Unit memecah dan menerjemahkan instruksi
-                            tersebut untuk mengetahui operasi apa yang harus dijalankan.</li>
-                        <li><strong>3. Execute (Mengeksekusi):</strong> Komponen internal CPU (seperti ALU) menjalankan
-                            operasi hitungan atau logika sesuai perintah.</li>
-                        <li><strong>4. Store (Menyimpan):</strong> Hasil akhir ditulis kembali ke dalam register atau
-                            memori utama, lalu PC diperbarui untuk instruksi berikutnya.</li>
-                    </ul>
-                </div>
+        <!-- Soal 2 -->
+        <div class="qa-card" id="soal-2">
+            <div class="question-box">
+                <span class="q-number">02</span>
+                <h2>Jelaskan cara kerja CPU dalam memproses instruksi.</h2>
             </div>
-
-            <!-- Soal 3 -->
-            <div class="qa-card" id="soal-3">
-                <div class="question-box">
-                    <span class="q-number">03</span>
-                    <h2>Gambarkan dan jelaskan struktur umum CPU (ALU, Control Unit, Register).</h2>
-                </div>
-                <div class="answer-box">
-                    <p>Secara internal, arsitektur dasar inti CPU terbagi menjadi tiga blok utama:</p>
-                    <div class="diagram-placeholder">
-                        <strong>Struktur Internal CPU</strong>
-                        <div class="diagram-ascii">
-                            +-------------------------------------------------------+
-                            | CORE CPU |
-                            | +--------------------+ +--------------------+ |
-                            | | CONTROL UNIT | <===> | ARITHMETIC LOGIC | |
-                                | | (Pusat Kendali/CU) | | UNIT (ALU) | |
-                                | +--------------------+ +--------------------+ |
-                                | ^ ^ |
-                                | | Jalur Data | |
-                                | v v |
-                                | +-------------------------------------------------+ |
-                                | | REGISTERS | |
-                                | | (PC, IR, Accumulator, MAR, MBR) | |
-                                | +-------------------------------------------------+ |
-                                +-------------------------------------------------------+
-                        </div>
-                    </div>
-                    <ul>
-                        <li><strong>Control Unit (CU):</strong> Mengatur sinkronisasi, membaca kode instruksi, dan
-                            memicu jalur kendali sirkuit.</li>
-                        <li><strong>Arithmetic Logic Unit (ALU):</strong> Sirkuit digital khusus yang mengeksekusi
-                            perhitungan matematika dasar (+, -, *, /) dan logika boolean (AND, OR, NOT).</li>
-                        <li><strong>Register:</strong> Memori internal ultra-cepat berkapasitas sangat kecil untuk
-                            menampung operand, alamat memori, dan status sistem secara instan.</li>
-                    </ul>
-                </div>
+            <div class="answer-box">
+                <p>CPU bekerja menggunakan siklus berulang yang dinamakan <strong>Siklus Instruksi (Instruction
+                        Cycle)</strong>:</p>
+                <ul>
+                    <li><strong>1. Fetch (Mengambil):</strong> Control Unit mengambil kode instruksi biner dari RAM
+                        berdasarkan alamat memori yang dipegang oleh Program Counter (PC).</li>
+                    <li><strong>2. Decode (Menerjemahkan):</strong> Control Unit memecah dan menerjemahkan instruksi
+                        tersebut untuk mengetahui operasi apa yang harus dijalankan.</li>
+                    <li><strong>3. Execute (Mengeksekusi):</strong> Komponen internal CPU (seperti ALU) menjalankan
+                        operasi hitungan atau logika sesuai perintah.</li>
+                    <li><strong>4. Store (Menyimpan):</strong> Hasil akhir ditulis kembali ke dalam register atau
+                        memori utama, lalu PC diperbarui untuk instruksi berikutnya.</li>
+                </ul>
             </div>
+        </div>
 
-            <!-- Soal 4 -->
-            <div class="qa-card" id="soal-4">
-                <div class="question-box">
-                    <span class="q-number">04</span>
-                    <h2>Jelaskan hierarki memori pada komputer dan buatlah diagram piramidanya.</h2>
-                </div>
-                <div class="answer-box">
-                    <p>Hierarki memori adalah penyusunan tingkatan memori komputer berdasarkan relasi terbalik antara
-                        kecepatan akses dengan kapasitas penyimpanan.</p>
-                    <div class="diagram-placeholder">
-                        <strong>Piramida Hierarki Memori</strong>
-                        <div class="diagram-ascii">
-                            /\ --> Tingkat 1: Register (Dalam CPU, Tercepat, Termahal)
-                            / \
-                            /----\ --> Tingkat 2: Cache Memory (L1, L2, L3 SRAM)
-                            / \
-                            /--------\ --> Tingkat 3: Memori Utama (RAM / DRAM, Volatile)
-                            / \
-                            /------------\ --> Tingkat 4: Secondary Storage (SSD, HDD, Non-Volatile)
-                            /--------------\
-                        </div>
-                    </div>
-                    <p>Semakin ke atas, memori memiliki waktu respons (latensi) paling minim namun kapasitasnya paling
-                        terbatas dan biaya produksinya tinggi.</p>
-                </div>
+        <!-- Soal 3 -->
+        <div class="qa-card" id="soal-3">
+            <div class="question-box">
+                <span class="q-number">03</span>
+                <h2>Gambarkan dan jelaskan struktur umum CPU (ALU, Control Unit, Register).</h2>
             </div>
-
-            <!-- Soal 5 -->
-            <div class="qa-card" id="soal-5">
-                <div class="question-box">
-                    <span class="q-number">05</span>
-                    <h2>Bandingkan memori cache, memori utama, dan register dalam bentuk tabel.</h2>
+            <div class="answer-box">
+                <p>Secara internal, arsitektur dasar inti CPU terbagi menjadi tiga blok utama:</p>
+                <div class="diagram-placeholder">
+                    <strong>Struktur Internal CPU</strong>
+<div class="diagram-ascii">+-------------------------------------------------------+
+|                       CORE CPU                        |
+|                                                       |
+|   +--------------------+     +--------------------+   |
+|   |    CONTROL UNIT    |     |  ARITHMETIC LOGIC  |   |
+|   |     (CU / Reg)     |     |     UNIT (ALU)     |   |
+|   +---------+----------+     +---------+----------+   |
+|             ^                          ^              |
+|             |        Jalur Data        |              |
+|             v                          v              |
+|   +-----------------------------------------------+   |
+|   |                   REGISTERS                   |   |
+|   |       (PC, IR, ACC, MAR, MBR, dll.)           |   |
+|   +-----------------------------------------------+   |
++-------------------------------------------------------+</div>
                 </div>
-                <div class="answer-box">
+                <ul>
+                    <li><strong>Control Unit (CU):</strong> Mengatur sinkronisasi, membaca kode instruksi, dan
+                        memicu jalur kendali sirkuit.</li>
+                    <li><strong>Arithmetic Logic Unit (ALU):</strong> Sirkuit digital khusus yang mengeksekusi
+                        perhitungan matematika dasar (+, -, *, /) dan logika boolean (AND, OR, NOT).</li>
+                    <li><strong>Register:</strong> Memori internal ultra-cepat berkapasitas sangat kecil untuk
+                        menampung operand, alamat memori, dan status sistem secara instan.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Soal 4 -->
+        <div class="qa-card" id="soal-4">
+            <div class="question-box">
+                <span class="q-number">04</span>
+                <h2>Jelaskan hierarki memori pada komputer dan buatlah diagram piramidanya.</h2>
+            </div>
+            <div class="answer-box">
+                <p>Hierarki memori adalah penyusunan tingkatan memori komputer berdasarkan relasi terbalik antara
+                    kecepatan akses dengan kapasitas penyimpanan.</p>
+                <div class="diagram-placeholder">
+                    <strong>Piramida Hierarki Memori</strong>
+<div class="diagram-ascii">                 /\        --> Lvl 1: Registers (CPU, Tercepat)
+                /  \
+               /----\      --> Lvl 2: Cache Memory (L1, L2, L3 SRAM)
+              /      \
+             /--------\    --> Lvl 3: Memori Utama (RAM / DRAM)
+            /          \
+           /------------\  --> Lvl 4: Storage Sekunder (SSD, HDD)
+          /--------------\</div>
+                </div>
+                <p>Semakin ke atas, memori memiliki waktu respons (latensi) paling minim namun kapasitasnya paling
+                    terbatas dan biaya produksinya tinggi.</p>
+            </div>
+        </div>
+
+        <!-- Soal 5 -->
+        <div class="qa-card" id="soal-5">
+            <div class="question-box">
+                <span class="q-number">05</span>
+                <h2>Bandingkan memori cache, memori utama, dan register dalam bentuk tabel.</h2>
+            </div>
+            <div class="answer-box">
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -884,111 +991,126 @@
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Soal 6 -->
-            <div class="qa-card" id="soal-6">
-                <div class="question-box">
-                    <span class="q-number">06</span>
-                    <h2>Jelaskan perbedaan arsitektur RISC dan CISC.</h2>
-                </div>
-                <div class="answer-box">
-                    <ul>
-                        <li><strong>RISC (Reduced Instruction Set Computer):</strong> Menekankan penggunaan set
-                            instruksi sederhana berukuran tetap yang dieksekusi dalam **satu siklus clock**.
-                            Kompleksitas dipindahkan ke perangkat lunak (compiler). Contoh: Arsitektur ARM (smartphone)
-                            dan Apple M-series.</li>
-                        <li><strong>CISC (Complex Instruction Set Computer):</strong> Menyediakan instruksi kompleks
-                            berskala besar yang mampu melakukan beberapa operasi memori sekaligus dalam **beberapa
-                            siklus clock**. Fokus pada kesederhanaan pembuatan program tingkat rendah. Contoh: Intel x86
-                            dan AMD.</li>
-                    </ul>
+        <!-- Soal 6 -->
+        <div class="qa-card" id="soal-6">
+            <div class="question-box">
+                <span class="q-number">06</span>
+                <h2>Jelaskan perbedaan arsitektur RISC dan CISC.</h2>
+            </div>
+            <div class="answer-box">
+                <ul>
+                    <li><strong>RISC (Reduced Instruction Set Computer):</strong> Menekankan penggunaan set
+                        instruksi sederhana berukuran tetap yang dieksekusi dalam **satu siklus clock**.
+                        Kompleksitas dipindahkan ke perangkat lunak (compiler). Contoh: Arsitektur ARM (smartphone)
+                        dan Apple M-series.</li>
+                    <li><strong>CISC (Complex Instruction Set Computer):</strong> Menyediakan instruksi kompleks
+                        berskala besar yang mampu melakukan beberapa operasi memori sekaligus dalam **beberapa
+                        siklus clock**. Fokus pada kesederhanaan pembuatan program tingkat rendah. Contoh: Intel x86
+                        dan AMD.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Soal 7 -->
+        <div class="qa-card" id="soal-7">
+            <div class="question-box">
+                <span class="q-number">07</span>
+                <h2>Uraikan fungsi bus data, bus alamat, dan bus kontrol beserta diagram jalurnya.</h2>
+            </div>
+            <div class="answer-box">
+                <p>Ketiga bus ini merupakan interkoneksi utama (System Bus) penyalur sinyal listrik digital di
+                    motherboard:</p>
+                <ul>
+                    <li><strong>Bus Data (Data Bus):</strong> Jalur dua arah untuk mendistribusikan data aktual
+                        antar modul.</li>
+                    <li><strong>Bus Alamat (Address Bus):</strong> Jalur satu arah dari CPU untuk menentukan lokasi
+                        fisik memori/port yang dituju.</li>
+                    <li><strong>Bus Kontrol (Control Bus):</strong> Jalur penyalur perintah operasi (Read/Write) dan
+                        sinyal waktu (Clock).</li>
+                </ul>
+                <div class="diagram-placeholder">
+<div class="diagram-ascii">+==========================================+
+[ CPU ] <==#====== BUS KONTROL (Sinyal Kontrol) =====#==> [ Memori ]
+           +==========================================+      /
+[ CPU ] ----#------ BUS ALAMAT (Lokasi Memori) -------#----> [Perangkat]
+           +==========================================+      \
+[ CPU ] <==#=========== BUS DATA (Nilai/Bit) =========#==>  [  I/O  ]
+           +==========================================+</div>
                 </div>
             </div>
+        </div>
 
-            <!-- Soal 7 -->
-            <div class="qa-card" id="soal-7">
-                <div class="question-box">
-                    <span class="q-number">07</span>
-                    <h2>Uraikan fungsi bus data, bus alamat, dan bus kontrol beserta diagram jalurnya.</h2>
-                </div>
-                <div class="answer-box">
-                    <p>Ketiga bus ini merupakan interkoneksi utama (System Bus) penyalur sinyal listrik digital di
-                        motherboard:</p>
-                    <ul>
-                        <li><strong>Bus Data (Data Bus):</strong> Jalur dua arah untuk mendistribusikan data aktual
-                            antar modul.</li>
-                        <li><strong>Bus Alamat (Address Bus):</strong> Jalur satu arah dari CPU untuk menentukan lokasi
-                            fisik memori/port yang dituju.</li>
-                        <li><strong>Bus Kontrol (Control Bus):</strong> Jalur penyalur perintah operasi (Read/Write) dan
-                            sinyal waktu (Clock).</li>
-                    </ul>
-                    <div class="diagram-placeholder">
-                        <div class="diagram-ascii">
-                            [ CPU ] <===========> BUS KONTROL (Sinyal Perintah) <===========> [ Memori / ]
-                                    [ ] ------------> BUS ALAMAT (Tujuan Lokasi) ------------> [ Perangkat]
-                                    [ ] <===========> BUS DATA (Isi Nilai/Bit) <===========> [ I/O ]
-                        </div>
-                    </div>
+        <!-- Soal 8 -->
+        <div class="qa-card" id="soal-8">
+            <div class="question-box">
+                <span class="q-number">08</span>
+                <h2>Jelaskan mekanisme input, proses, dan output beserta bagan alirnya.</h2>
+            </div>
+            <div class="answer-box">
+                <p>Data mentah masuk melalui unit input, dimuat ke memori, diolah oleh algoritma CPU, lalu dikirim
+                    ke media luaran untuk dibaca pengguna.</p>
+                <div class="diagram-placeholder">
+                    <strong>Bagan Alir (Flowchart) Kerja Sistem</strong>
+<div class="diagram-ascii">  [ Mulai ]
+      |
+      v
+ [ Input Data ]
+      |
+      v
+[ Simpan di RAM ]
+      |
+      v
+ [ Proses CPU ]
+      |
+      v
+[ Tampil Output ]
+      |
+      v
+ [ Selesai ]</div>
                 </div>
             </div>
+        </div>
 
-            <!-- Soal 8 -->
-            <div class="qa-card" id="soal-8">
-                <div class="question-box">
-                    <span class="q-number">08</span>
-                    <h2>Jelaskan mekanisme input, proses, dan output beserta bagan alirnya.</h2>
-                </div>
-                <div class="answer-box">
-                    <p>Data mentah masuk melalui unit input, dimuat ke memori, diolah oleh algoritma CPU, lalu dikirim
-                        ke media luaran untuk dibaca pengguna.</p>
-                    <div class="diagram-placeholder">
-                        <strong>Bagan Alir (Flowchart) Kerja Sistem</strong>
-                        <div class="diagram-ascii">
-                            [Mulai] -> (Input Data) -> [Simpan di RAM] -> [Proses Data di CPU]
-                            |
-                            [Selesai] <- (Tampilkan Output) <------------------+ </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Soal 9 -->
+        <div class="qa-card" id="soal-9">
+            <div class="question-box">
+                <span class="q-number">09</span>
+                <h2>Jelaskan konsep pipelining dalam prosesor.</h2>
+            </div>
+            <div class="answer-box">
+                <p><strong>Pipelining</strong> adalah teknik arsitektur perangkat keras di mana prosesor memecah
+                    pengerjaan instruksi menjadi beberapa tahapan sub-proses independen, sehingga beberapa
+                    instruksi dapat diproses **secara paralel/bersamaan** pada fase siklus yang berbeda.</p>
+                <p>Sebagai analogi, ini seperti lini perakitan pabrik mobil; selagi mobil pertama memasuki tahap
+                    pengecatan, mobil kedua sudah mulai dirakit di tahap pengelasan rangka tanpa harus menunggu
+                    mobil pertama selesai total. Hal ini melipatgandakan produktivitas kinerja prosesor.</p>
+            </div>
+        </div>
 
-                <!-- Soal 9 -->
-                <div class="qa-card" id="soal-9">
-                    <div class="question-box">
-                        <span class="q-number">09</span>
-                        <h2>Jelaskan konsep pipelining dalam prosesor.</h2>
-                    </div>
-                    <div class="answer-box">
-                        <p><strong>Pipelining</strong> adalah teknik arsitektur perangkat keras di mana prosesor memecah
-                            pengerjaan instruksi menjadi beberapa tahapan sub-proses independen, sehingga beberapa
-                            instruksi dapat diproses **secara paralel/bersamaan** pada fase siklus yang berbeda.</p>
-                        <p>Sebagai analogi, ini seperti lini perakitan pabrik mobil; selagi mobil pertama memasuki tahap
-                            pengecatan, mobil kedua sudah mulai dirakit di tahap pengelasan rangka tanpa harus menunggu
-                            mobil pertama selesai total. Hal ini melipatgandakan produktivitas kinerja prosesor.</p>
-                    </div>
-                </div>
-
-                <!-- Soal 10 -->
-                <div class="qa-card" id="soal-10">
-                    <div class="question-box">
-                        <span class="q-number">10</span>
-                        <h2>Jelaskan perbedaan sistem bilangan biner, desimal, oktal, dan heksadesimal.</h2>
-                    </div>
-                    <div class="answer-box">
-                        <p>Perbedaan mendasar terletak pada basis radiks (jumlah simbol numerik unik yang digunakan):
-                        </p>
-                        <ul>
-                            <li><strong>Biner (Basis 2):</strong> Menggunakan 2 simbol (0, 1). Merupakan representasi
-                                sinyal saklar digital komputer.</li>
-                            <li><strong>Oktal (Basis 8):</strong> Menggunakan 8 simbol (0 sampai 7). Digunakan untuk
-                                mengelompokkan kode biner 3-bit.</li>
-                            <li><strong>Desimal (Basis 10):</strong> Menggunakan 10 simbol (0 sampai 9). Standar
-                                hitungan peradaban manusia.</li>
-                            <li><strong>Heksadesimal (Basis 16):</strong> Menggunakan 16 simbol (0-9 ditambahkan A=10
-                                s.d F=15). Efektif untuk meringkas pembacaan 1 byte data (8-bit biner menjadi 2 karakter
-                                heksa saja, misal alamat memori).</li>
-                        </ul>
-                    </div>
-                </div>
+        <!-- Soal 10 -->
+        <div class="qa-card" id="soal-10">
+            <div class="question-box">
+                <span class="q-number">10</span>
+                <h2>Jelaskan perbedaan sistem bilangan biner, desimal, oktal, dan heksadesimal.</h2>
+            </div>
+            <div class="answer-box">
+                <p>Perbedaan mendasar terletak pada basis radiks (jumlah simbol numerik unik yang digunakan):
+                </p>
+                <ul>
+                    <li><strong>Biner (Basis 2):</strong> Menggunakan 2 simbol (0, 1). Merupakan representasi
+                        sinyal saklar digital komputer.</li>
+                    <li><strong>Oktal (Basis 8):</strong> Menggunakan 8 simbol (0 sampai 7). Digunakan untuk
+                        mengelompokkan kode biner 3-bit.</li>
+                    <li><strong>Desimal (Basis 10):</strong> Menggunakan 10 simbol (0 sampai 9). Standar
+                        hitungan peradaban manusia.</li>
+                    <li><strong>Heksadesimal (Basis 16):</strong> Menggunakan 16 simbol (0-9 ditambahkan A=10
+                        s.d F=15). Efektif untuk meringkas pembacaan 1 byte data (8-bit biner menjadi 2 karakter
+                        heksa saja, misal alamat memori).</li>
+                </ul>
+            </div>
+        </div>
 
     </section>
 
@@ -1012,7 +1134,7 @@
             function openSidebar() {
                 sidebar.classList.add('active');
                 overlay.classList.add('active');
-                sidebar.style.transform = 'translateX(-360px)';
+                sidebar.style.transform = 'translateX(0)';
                 sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1)';
             }
 
@@ -1068,8 +1190,7 @@
 
                 // Only allow dragging to the right (towards close)
                 if (deltaX > 0) {
-                    const translateVal = -360 + deltaX;
-                    sidebar.style.transform = `translateX(${translateVal}px)`;
+                    sidebar.style.transform = `translateX(${deltaX}px)`;
                 }
             }
 
@@ -1079,12 +1200,13 @@
                 sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1)';
 
                 const deltaX = currentX - startX;
+                const threshold = sidebar.offsetWidth * 0.25; // 25% of sidebar width
 
-                // If dragged more than 80px to the right, close. Otherwise snap back.
-                if (deltaX > 80) {
+                // If dragged more than threshold to the right, close. Otherwise snap back.
+                if (deltaX > threshold) {
                     closeSidebar();
                 } else {
-                    sidebar.style.transform = 'translateX(-360px)';
+                    sidebar.style.transform = 'translateX(0)';
                 }
             }
 
