@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organisasi & Arsitektur Komputer</title>
+    <!-- Google Fonts: Space Grotesk & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #E2ED15;
+            --dark-bg: #242424;
+            --card-bg: #1a1a1a;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A5C0;
+            --text-dark: #242424;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(36, 36, 36, 0.95), rgba(36, 36, 36, 0));
+            backdrop-filter: blur(5px);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Dropdown & Materi Button */
+        .btn-materi {
+            background-color: var(--primary);
+            color: var(--text-dark);
+            padding: 8px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            outline: none;
+        }
+
+        .btn-materi svg {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-materi:hover {
+            background-color: transparent;
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(226, 237, 21, 0.4);
+        }
+
+        .btn-materi:hover svg {
+            transform: translateY(2px);
+        }
+
+        /* Sidebar Drawer Styles (Geser / Swipe to close) */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-drawer {
+            position: fixed;
+            top: 0;
+            right: -360px;
+            /* Hidden initially */
+            width: 360px;
+            height: 100vh;
+            background-color: #1a1a1a;
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .sidebar-drawer.active {
+            transform: translateX(-360px);
+        }
+
+        /* Drag Handle on the left side of sidebar to pull it close */
+        .sidebar-drag-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 100%;
+            cursor: ew-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.01);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-drag-handle:hover {
+            background-color: rgba(226, 237, 21, 0.04);
+        }
+
+        .sidebar-drag-handle span {
+            width: 4px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .sidebar-drag-handle span::before,
+        .sidebar-drag-handle span::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            top: 0;
+        }
+
+        .sidebar-drag-handle span::before {
+            left: -6px;
+        }
+
+        .sidebar-drag-handle span::after {
+            left: 6px;
+        }
+
+        .sidebar-header {
+            padding: 24px 24px 24px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-header h3 {
+            font-family: var(--font-heading);
+            color: var(--text-main);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .btn-close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            line-height: 1;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close-sidebar:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px 24px 36px;
+        }
+
+        /* Scrollbar styling for sidebar */
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(226, 237, 21, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(226, 237, 21, 0.08);
+            color: var(--text-main);
+            transform: translateX(6px);
+        }
+
+        .sidebar-item .item-num {
+            background-color: rgba(226, 237, 21, 0.15);
+            color: var(--primary);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover .item-num {
+            background-color: var(--primary);
+            color: var(--text-dark);
+        }
+
+        .sidebar-item .item-text {
+            line-height: 1.4;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .menu-grid-icon {
+            display: grid;
+            grid-template-columns: repeat(3, 4px);
+            gap: 3px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu-grid-icon:hover {
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        .menu-grid-icon span {
+            width: 4px;
+            height: 4px;
+            background-color: var(--text-main);
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu-grid-icon:hover span {
+            background-color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: var(--primary);
+            color: var(--text-dark);
+            min-height: 90vh;
+            padding: 120px 8% 60px 8%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            gap: 40px;
+        }
+
+        .hero-content {
+            max-width: 550px;
+        }
+
+        .tag-uas {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .hero-content h1 {
+            font-family: var(--font-heading);
+            font-size: 4rem;
+            line-height: 1.1;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .hero-image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .hero-image-container img {
+            max-width: 80%;
+            height: auto;
+            filter: drop-shadow(0px 20px 40px rgba(0, 0, 0, 0.3));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Pengertian Section */
+        .intro-section {
+            padding: 100px 8%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+        }
+
+        .intro-text {
+            max-width: 500px;
+        }
+
+        .intro-text h3 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .intro-text p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-align: justify;
+        }
+
+        .intro-circle-img {
+            width: 300px;
+            height: 300px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 8px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .intro-circle-img img {
+            width: 80%;
+            height: auto;
+        }
+
+        /* Materi / QA Section */
+        .materi-container {
+            padding: 60px 8% 100px 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            border-left: 5px solid var(--primary);
+            padding-left: 20px;
+        }
+
+        .qa-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            scroll-margin-top: 95px;
+            /* Offset for smooth scrolling with fixed navbar */
+        }
+
+        .qa-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(226, 237, 21, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Target state highlighting when navigating to specific questions */
+        .qa-card:target {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(226, 237, 21, 0.2);
+            transform: scale(1.02);
+        }
+
+        .question-box {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .q-number {
+            background-color: var(--primary);
+            color: var(--text-dark);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .question-box h2 {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .answer-box {
+            padding-left: 45px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Custom styling inside answers */
+        .answer-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .answer-box ul li {
+            margin-bottom: 8px;
+        }
+
+        .answer-box strong {
+            color: var(--text-main);
+        }
+
+        .diagram-placeholder {
+            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-main);
+        }
+
+        .diagram-ascii {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #121212;
+            padding: 15px;
+            border-radius: 8px;
+            color: var(--primary);
+            text-align: left;
+            display: inline-block;
+            margin-top: 15px;
+            max-width: 100%;
+            overflow-x: auto;
+            font-size: 0.85rem;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(226, 237, 21, 0.1);
+            color: var(--primary);
+            font-family: var(--font-heading);
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 140px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+
+            .intro-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .intro-text {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .answer-box {
+                padding-left: 0;
+                margin-top: 15px;
+            }
+
+            th,
+            td {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">COMP.ORG</div>
+        <div class="nav-right">
+            <button class="btn-materi" id="btn-materi-trigger">
+                Materi
+                <svg class="chevron-icon" width="10" height="6" viewBox="0 0 10 6" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+            <div class="menu-grid-icon" id="menu-grid-trigger">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Drawer (Geser) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="sidebar-drawer" id="sidebar-drawer">
+        <div class="sidebar-header">
+            <h3>Daftar Materi Soal</h3>
+            <button class="btn-close-sidebar" id="btn-close-sidebar" aria-label="Close menu">&times;</button>
+        </div>
+        <div class="sidebar-drag-handle" id="sidebar-drag-handle" title="Tarik ke kanan untuk menutup">
+            <span></span>
+        </div>
+        <div class="sidebar-content">
+            <a href="#soal-1" class="sidebar-item">
+                <span class="item-num">01</span>
+                <span class="item-text">Komponen Utama & Diagram Blok</span>
+            </a>
+            <a href="#soal-2" class="sidebar-item">
+                <span class="item-num">02</span>
+                <span class="item-text">Cara Kerja CPU (Siklus Instruksi)</span>
+            </a>
+            <a href="#soal-3" class="sidebar-item">
+                <span class="item-num">03</span>
+                <span class="item-text">Struktur Umum CPU (ALU, CU, Register)</span>
+            </a>
+            <a href="#soal-4" class="sidebar-item">
+                <span class="item-num">04</span>
+                <span class="item-text">Hierarki Memori Komputer</span>
+            </a>
+            <a href="#soal-5" class="sidebar-item">
+                <span class="item-num">05</span>
+                <span class="item-text">Perbandingan Jenis Memori (Tabel)</span>
+            </a>
+            <a href="#soal-6" class="sidebar-item">
+                <span class="item-num">06</span>
+                <span class="item-text">Perbedaan RISC vs CISC</span>
+            </a>
+            <a href="#soal-7" class="sidebar-item">
+                <span class="item-num">07</span>
+                <span class="item-text">Sistem Bus (Data, Alamat, Kontrol)</span>
+            </a>
+            <a href="#soal-8" class="sidebar-item">
+                <span class="item-num">08</span>
+                <span class="item-text">Mekanisme Kerja Input, Proses, Output</span>
+            </a>
+            <a href="#soal-9" class="sidebar-item">
+                <span class="item-num">09</span>
+                <span class="item-text">Konsep Pipelining Prosesor</span>
+            </a>
+            <a href="#soal-10" class="sidebar-item">
+                <span class="item-num">10</span>
+                <span class="item-text">Sistem Bilangan Komputer</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="tag-uas">★ Tugas Arsitektur</div>
+            <h1>Organisasi Komputer</h1>
+            <p>Mempelajari cara kerja komputer dari sisi unit operasional, hubungan antar komponen hardware, hierarki
+                memori, antarmuka, hingga transmisi sinyal kontrol sistem.</p>
+        </div>
+        <div class="hero-image-container">
+            <img src="assets/computer.png" alt="Komputer Klasik">
+        </div>
+    </section>
+
+    <!-- Pengertian Section -->
+    <section class="intro-section">
+        <div class="intro-text">
+            <h3>Pengertian Sistem Komputer</h3>
+            <p>Sistem komputer adalah suatu kesatuan yang terdiri atas perangkat keras (hardware), perangkat lunak
+                (software), dan pengguna (brainware) yang bekerja sama untuk mengolah data menjadi informasi. Dalam
+                organisasi komputer, fokus utama adalah bagaimana komponen perangkat keras saling berinteraksi untuk
+                menjalankan proses komputasi secara efisien.</p>
+        </div>
+        <div class="intro-circle-img">
+            <!-- SVG Ilustrasi Vektor Interaksi -->
+            <svg width="150" height="150" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="40" stroke="var(--dark-bg)" stroke-width="4" stroke-dasharray="5 5" />
+                <rect x="35" y="35" width="30" height="30" rx="5" fill="var(--dark-bg)" />
+                <path d="M50 20V35M50 65V80M20 50H35M65 50H80" stroke="var(--dark-bg)" stroke-width="3"
+                    stroke-linecap="round" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Main Content Section -->
+    <section class="materi-container" id="materi-section">
+        <h1 class="section-title">Soal & Jawaban Pembahasan</h1>
+
+        <!-- Soal 1 -->
+        <div class="qa-card" id="soal-1">
+            <div class="question-box">
+                <span class="q-number">01</span>
+                <h2>Uraikan komponen utama sistem komputer dan buatlah gambar blok diagram beserta fungsinya.</h2>
+            </div>
+            <div class="answer-box">
+                <p>Sistem komputer terdiri dari tiga komponen utama: <strong>Hardware</strong> (fisik),
+                    <strong>Software</strong> (program/instruksi), dan <strong>Brainware</strong> (manusia/pengguna).
+                </p>
+                <div class="diagram-placeholder">
+                    <strong>Blok Diagram Sistem Komputer (Model Von Neumann)</strong>
+                    <div class="diagram-ascii">
+                        +------------------+ Sinyal Kendali +--------------------+
+                        | UNIT MASUKAN | ---------------------> | CENTRAL |
+                        | (Keyboard/Mouse) | <--------------------- | PROCESSING UNIT | +------------------+ | (CPU) | |
+                            +--------------------+ | Transfer Data | v | Transfer Hasil +------------------+ v | MEMORI
+                            UTAMA | +--------------------+ | (RAM) | | UNIT KELUARAN | +------------------+ |
+                            (Monitor/Printer) | +--------------------+ </div>
+                    </div>
+                    <ul>
+                        <li><strong>Unit Masukan:</strong> Menerima data mentah dari luar dan mengonversinya ke sinyal
+                            digital.</li>
+                        <li><strong>CPU:</strong> Otak pemroses utama yang mengeksekusi perintah dan mengendalikan semua
+                            unit.</li>
+                        <li><strong>Memori Utama:</strong> Penyimpanan volatile untuk menyimpan program dan data aktif
+                            sementara.</li>
+                        <li><strong>Unit Keluaran:</strong> Menyajikan informasi hasil pemrosesan ke format yang
+                            dimengerti pengguna.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Soal 2 -->
+            <div class="qa-card" id="soal-2">
+                <div class="question-box">
+                    <span class="q-number">02</span>
+                    <h2>Jelaskan cara kerja CPU dalam memproses instruksi.</h2>
+                </div>
+                <div class="answer-box">
+                    <p>CPU bekerja menggunakan siklus berulang yang dinamakan <strong>Siklus Instruksi (Instruction
+                            Cycle)</strong>:</p>
+                    <ul>
+                        <li><strong>1. Fetch (Mengambil):</strong> Control Unit mengambil kode instruksi biner dari RAM
+                            berdasarkan alamat memori yang dipegang oleh Program Counter (PC).</li>
+                        <li><strong>2. Decode (Menerjemahkan):</strong> Control Unit memecah dan menerjemahkan instruksi
+                            tersebut untuk mengetahui operasi apa yang harus dijalankan.</li>
+                        <li><strong>3. Execute (Mengeksekusi):</strong> Komponen internal CPU (seperti ALU) menjalankan
+                            operasi hitungan atau logika sesuai perintah.</li>
+                        <li><strong>4. Store (Menyimpan):</strong> Hasil akhir ditulis kembali ke dalam register atau
+                            memori utama, lalu PC diperbarui untuk instruksi berikutnya.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Soal 3 -->
+            <div class="qa-card" id="soal-3">
+                <div class="question-box">
+                    <span class="q-number">03</span>
+                    <h2>Gambarkan dan jelaskan struktur umum CPU (ALU, Control Unit, Register).</h2>
+                </div>
+                <div class="answer-box">
+                    <p>Secara internal, arsitektur dasar inti CPU terbagi menjadi tiga blok utama:</p>
+                    <div class="diagram-placeholder">
+                        <strong>Struktur Internal CPU</strong>
+                        <div class="diagram-ascii">
+                            +-------------------------------------------------------+
+                            | CORE CPU |
+                            | +--------------------+ +--------------------+ |
+                            | | CONTROL UNIT | <===> | ARITHMETIC LOGIC | |
+                                | | (Pusat Kendali/CU) | | UNIT (ALU) | |
+                                | +--------------------+ +--------------------+ |
+                                | ^ ^ |
+                                | | Jalur Data | |
+                                | v v |
+                                | +-------------------------------------------------+ |
+                                | | REGISTERS | |
+                                | | (PC, IR, Accumulator, MAR, MBR) | |
+                                | +-------------------------------------------------+ |
+                                +-------------------------------------------------------+
+                        </div>
+                    </div>
+                    <ul>
+                        <li><strong>Control Unit (CU):</strong> Mengatur sinkronisasi, membaca kode instruksi, dan
+                            memicu jalur kendali sirkuit.</li>
+                        <li><strong>Arithmetic Logic Unit (ALU):</strong> Sirkuit digital khusus yang mengeksekusi
+                            perhitungan matematika dasar (+, -, *, /) dan logika boolean (AND, OR, NOT).</li>
+                        <li><strong>Register:</strong> Memori internal ultra-cepat berkapasitas sangat kecil untuk
+                            menampung operand, alamat memori, dan status sistem secara instan.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Soal 4 -->
+            <div class="qa-card" id="soal-4">
+                <div class="question-box">
+                    <span class="q-number">04</span>
+                    <h2>Jelaskan hierarki memori pada komputer dan buatlah diagram piramidanya.</h2>
+                </div>
+                <div class="answer-box">
+                    <p>Hierarki memori adalah penyusunan tingkatan memori komputer berdasarkan relasi terbalik antara
+                        kecepatan akses dengan kapasitas penyimpanan.</p>
+                    <div class="diagram-placeholder">
+                        <strong>Piramida Hierarki Memori</strong>
+                        <div class="diagram-ascii">
+                            /\ --> Tingkat 1: Register (Dalam CPU, Tercepat, Termahal)
+                            / \
+                            /----\ --> Tingkat 2: Cache Memory (L1, L2, L3 SRAM)
+                            / \
+                            /--------\ --> Tingkat 3: Memori Utama (RAM / DRAM, Volatile)
+                            / \
+                            /------------\ --> Tingkat 4: Secondary Storage (SSD, HDD, Non-Volatile)
+                            /--------------\
+                        </div>
+                    </div>
+                    <p>Semakin ke atas, memori memiliki waktu respons (latensi) paling minim namun kapasitasnya paling
+                        terbatas dan biaya produksinya tinggi.</p>
+                </div>
+            </div>
+
+            <!-- Soal 5 -->
+            <div class="qa-card" id="soal-5">
+                <div class="question-box">
+                    <span class="q-number">05</span>
+                    <h2>Bandingkan memori cache, memori utama, dan register dalam bentuk tabel.</h2>
+                </div>
+                <div class="answer-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Karakteristik</th>
+                                <th>Register</th>
+                                <th>Memori Cache</th>
+                                <th>Memori Utama (RAM)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Kecepatan</strong></td>
+                                <td>Sangat Tinggi (&lt; 1 nanodetik)</td>
+                                <td>Tinggi (1 - 10 nanodetik)</td>
+                                <td>Sedang (10 - 60 nanodetik)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kapasitas</strong></td>
+                                <td>Beberapa Byte s.d KiloByte</td>
+                                <td>Beberapa MegaByte (MB)</td>
+                                <td>GigaByte (8GB - 64GB+)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fungsi</strong></td>
+                                <td>Menyimpan data instruksi aktif yang dieksekusi detik itu juga.</td>
+                                <td>Menyimpan salinan data RAM terpopuler agar CPU tidak menunggu lama.</td>
+                                <td>Menampung data program aktif dan sistem operasi secara volatile.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Soal 6 -->
+            <div class="qa-card" id="soal-6">
+                <div class="question-box">
+                    <span class="q-number">06</span>
+                    <h2>Jelaskan perbedaan arsitektur RISC dan CISC.</h2>
+                </div>
+                <div class="answer-box">
+                    <ul>
+                        <li><strong>RISC (Reduced Instruction Set Computer):</strong> Menekankan penggunaan set
+                            instruksi sederhana berukuran tetap yang dieksekusi dalam **satu siklus clock**.
+                            Kompleksitas dipindahkan ke perangkat lunak (compiler). Contoh: Arsitektur ARM (smartphone)
+                            dan Apple M-series.</li>
+                        <li><strong>CISC (Complex Instruction Set Computer):</strong> Menyediakan instruksi kompleks
+                            berskala besar yang mampu melakukan beberapa operasi memori sekaligus dalam **beberapa
+                            siklus clock**. Fokus pada kesederhanaan pembuatan program tingkat rendah. Contoh: Intel x86
+                            dan AMD.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Soal 7 -->
+            <div class="qa-card" id="soal-7">
+                <div class="question-box">
+                    <span class="q-number">07</span>
+                    <h2>Uraikan fungsi bus data, bus alamat, dan bus kontrol beserta diagram jalurnya.</h2>
+                </div>
+                <div class="answer-box">
+                    <p>Ketiga bus ini merupakan interkoneksi utama (System Bus) penyalur sinyal listrik digital di
+                        motherboard:</p>
+                    <ul>
+                        <li><strong>Bus Data (Data Bus):</strong> Jalur dua arah untuk mendistribusikan data aktual
+                            antar modul.</li>
+                        <li><strong>Bus Alamat (Address Bus):</strong> Jalur satu arah dari CPU untuk menentukan lokasi
+                            fisik memori/port yang dituju.</li>
+                        <li><strong>Bus Kontrol (Control Bus):</strong> Jalur penyalur perintah operasi (Read/Write) dan
+                            sinyal waktu (Clock).</li>
+                    </ul>
+                    <div class="diagram-placeholder">
+                        <div class="diagram-ascii">
+                            [ CPU ] <===========> BUS KONTROL (Sinyal Perintah) <===========> [ Memori / ]
+                                    [ ] ------------> BUS ALAMAT (Tujuan Lokasi) ------------> [ Perangkat]
+                                    [ ] <===========> BUS DATA (Isi Nilai/Bit) <===========> [ I/O ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soal 8 -->
+            <div class="qa-card" id="soal-8">
+                <div class="question-box">
+                    <span class="q-number">08</span>
+                    <h2>Jelaskan mekanisme input, proses, dan output beserta bagan alirnya.</h2>
+                </div>
+                <div class="answer-box">
+                    <p>Data mentah masuk melalui unit input, dimuat ke memori, diolah oleh algoritma CPU, lalu dikirim
+                        ke media luaran untuk dibaca pengguna.</p>
+                    <div class="diagram-placeholder">
+                        <strong>Bagan Alir (Flowchart) Kerja Sistem</strong>
+                        <div class="diagram-ascii">
+                            [Mulai] -> (Input Data) -> [Simpan di RAM] -> [Proses Data di CPU]
+                            |
+                            [Selesai] <- (Tampilkan Output) <------------------+ </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soal 9 -->
+                <div class="qa-card" id="soal-9">
+                    <div class="question-box">
+                        <span class="q-number">09</span>
+                        <h2>Jelaskan konsep pipelining dalam prosesor.</h2>
+                    </div>
+                    <div class="answer-box">
+                        <p><strong>Pipelining</strong> adalah teknik arsitektur perangkat keras di mana prosesor memecah
+                            pengerjaan instruksi menjadi beberapa tahapan sub-proses independen, sehingga beberapa
+                            instruksi dapat diproses **secara paralel/bersamaan** pada fase siklus yang berbeda.</p>
+                        <p>Sebagai analogi, ini seperti lini perakitan pabrik mobil; selagi mobil pertama memasuki tahap
+                            pengecatan, mobil kedua sudah mulai dirakit di tahap pengelasan rangka tanpa harus menunggu
+                            mobil pertama selesai total. Hal ini melipatgandakan produktivitas kinerja prosesor.</p>
+                    </div>
+                </div>
+
+                <!-- Soal 10 -->
+                <div class="qa-card" id="soal-10">
+                    <div class="question-box">
+                        <span class="q-number">10</span>
+                        <h2>Jelaskan perbedaan sistem bilangan biner, desimal, oktal, dan heksadesimal.</h2>
+                    </div>
+                    <div class="answer-box">
+                        <p>Perbedaan mendasar terletak pada basis radiks (jumlah simbol numerik unik yang digunakan):
+                        </p>
+                        <ul>
+                            <li><strong>Biner (Basis 2):</strong> Menggunakan 2 simbol (0, 1). Merupakan representasi
+                                sinyal saklar digital komputer.</li>
+                            <li><strong>Oktal (Basis 8):</strong> Menggunakan 8 simbol (0 sampai 7). Digunakan untuk
+                                mengelompokkan kode biner 3-bit.</li>
+                            <li><strong>Desimal (Basis 10):</strong> Menggunakan 10 simbol (0 sampai 9). Standar
+                                hitungan peradaban manusia.</li>
+                            <li><strong>Heksadesimal (Basis 16):</strong> Menggunakan 16 simbol (0-9 ditambahkan A=10
+                                s.d F=15). Efektif untuk meringkas pembacaan 1 byte data (8-bit biner menjadi 2 karakter
+                                heksa saja, misal alamat memori).</li>
+                        </ul>
+                    </div>
+                </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Tugas UAS Organisasi Komputer. Built by Rizky Adinursanto(102250008).</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar-drawer');
+            const overlay = document.getElementById('sidebar-overlay');
+            const btnMateri = document.getElementById('btn-materi-trigger');
+            const menuGrid = document.getElementById('menu-grid-trigger');
+            const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+            const dragHandle = document.getElementById('sidebar-drag-handle');
+
+            let isDragging = false;
+            let startX = 0;
+            let currentX = 0;
+
+            function openSidebar() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                sidebar.style.transform = 'translateX(-360px)';
+                sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1)';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                sidebar.style.transform = '';
+                sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1)';
+            }
+
+            btnMateri.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openSidebar();
+            });
+
+            menuGrid.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openSidebar();
+            });
+
+            btnCloseSidebar.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // Escape key to close
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeSidebar();
+                }
+            });
+
+            // Close on sidebar item click
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    closeSidebar();
+                });
+            });
+
+            // Drag/Geser to close logic
+            function dragStart(e) {
+                isDragging = true;
+                startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                currentX = startX;
+                sidebar.style.transition = 'none'; // Disable transition during drag
+            }
+
+            function dragMove(e) {
+                if (!isDragging) return;
+                currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const deltaX = currentX - startX;
+
+                // Only allow dragging to the right (towards close)
+                if (deltaX > 0) {
+                    const translateVal = -360 + deltaX;
+                    sidebar.style.transform = `translateX(${translateVal}px)`;
+                }
+            }
+
+            function dragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1)';
+
+                const deltaX = currentX - startX;
+
+                // If dragged more than 80px to the right, close. Otherwise snap back.
+                if (deltaX > 80) {
+                    closeSidebar();
+                } else {
+                    sidebar.style.transform = 'translateX(-360px)';
+                }
+            }
+
+            // Mouse Events
+            dragHandle.addEventListener('mousedown', dragStart);
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+
+            // Touch Events (for mobile)
+            dragHandle.addEventListener('touchstart', dragStart, { passive: true });
+            document.addEventListener('touchmove', dragMove, { passive: true });
+            document.addEventListener('touchend', dragEnd);
+        });
+    </script>
+</body>
+
+</html>
